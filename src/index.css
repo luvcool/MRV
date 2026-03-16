@@ -1,0 +1,467 @@
+/* ===========================
+   HKMC Barcode Scanner — CSS
+   =========================== */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --hkmc-blue: #002C5F;
+  --hkmc-blue-light: #1A4A8A;
+  --accent: #00AAD2;
+  --bg: #F4F6FA;
+  --surface: #FFFFFF;
+  --border: #D8DDE6;
+  --text: #1A1A2E;
+  --text-muted: #6B7280;
+  --ok: #16A34A;
+  --missing: #DC2626;
+  --info: #0369A1;
+  --radius: 12px;
+  --shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+html, body {
+  height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#root {
+  height: 100%;
+}
+
+/* === App Layout === */
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  max-width: 480px;
+  margin: 0 auto;
+  background: var(--surface);
+  box-shadow: 0 0 20px rgba(0,0,0,0.08);
+}
+
+/* === Header === */
+.app-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--hkmc-blue);
+  color: white;
+  padding: 12px 16px;
+  padding-top: calc(12px + env(safe-area-inset-top));
+  flex-shrink: 0;
+}
+
+.header-logo { display: flex; align-items: center; }
+
+.header-title {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+
+/* === Tab Bar === */
+.tab-bar {
+  display: flex;
+  background: var(--surface);
+  border-bottom: 2px solid var(--border);
+  flex-shrink: 0;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  background: none;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-muted);
+  cursor: pointer;
+  position: relative;
+  transition: color 0.15s;
+}
+
+.tab-btn.active {
+  color: var(--hkmc-blue);
+  font-weight: 700;
+}
+
+.tab-btn.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--hkmc-blue);
+}
+
+.tab-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent);
+  color: white;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 700;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  margin-left: 6px;
+}
+
+/* === Main === */
+.app-main {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* === Scan Page === */
+.scan-page {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* === Scanner === */
+.scanner-container {
+  background: #000;
+  position: relative;
+}
+
+.camera-select {
+  background: rgba(0,0,0,0.7);
+  padding: 6px 12px;
+}
+
+.camera-select select {
+  width: 100%;
+  background: rgba(255,255,255,0.1);
+  color: white;
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-size: 13px;
+}
+
+.video-wrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4/3;
+  background: #111;
+  overflow: hidden;
+}
+
+.scanner-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.scan-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.scan-frame {
+  width: 65%;
+  aspect-ratio: 1;
+  border: 3px solid rgba(255,255,255,0.9);
+  border-radius: 8px;
+  box-shadow:
+    0 0 0 4000px rgba(0,0,0,0.35),
+    inset 0 0 0 2px rgba(255,255,255,0.15);
+  animation: scan-pulse 2s ease-in-out infinite;
+}
+
+@keyframes scan-pulse {
+  0%, 100% { border-color: rgba(255,255,255,0.9); }
+  50% { border-color: rgba(0, 170, 210, 0.9); }
+}
+
+.scanner-paused {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.scanner-error {
+  background: #FEF2F2;
+  color: var(--missing);
+  padding: 10px 14px;
+  font-size: 13px;
+  border-left: 3px solid var(--missing);
+}
+
+/* === Scan Controls === */
+.scan-controls {
+  display: flex;
+  gap: 10px;
+  padding: 12px 16px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+
+.btn {
+  flex: 1;
+  padding: 11px 16px;
+  border-radius: 10px;
+  border: none;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+  letter-spacing: -0.2px;
+}
+
+.btn:active { transform: scale(0.97); opacity: 0.85; }
+
+.btn-primary { background: var(--hkmc-blue); color: white; }
+.btn-secondary { background: var(--border); color: var(--text); }
+
+/* === No Result === */
+.no-result {
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+/* === Result Card === */
+.result-card {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.section-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 8px;
+}
+
+/* Raw String */
+.raw-section {}
+
+.raw-string {
+  background: #1A1A2E;
+  color: #A5F3FC;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  padding: 12px;
+  border-radius: 8px;
+  word-break: break-all;
+  line-height: 1.6;
+  overflow-x: auto;
+}
+
+/* Multi-part */
+.multipart-banner {
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 13px;
+  color: #1D4ED8;
+}
+
+.multipart-list {
+  margin-top: 6px;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-family: monospace;
+  font-weight: 600;
+}
+
+/* Table */
+.table-wrapper {
+  overflow-x: auto;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+}
+
+.result-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.result-table thead {
+  background: var(--hkmc-blue);
+  color: white;
+}
+
+.result-table th {
+  padding: 10px 12px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.result-table tbody tr {
+  border-bottom: 1px solid var(--border);
+}
+
+.result-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.result-table tbody tr:nth-child(even) {
+  background: #F8FAFC;
+}
+
+.result-table td {
+  padding: 10px 12px;
+  vertical-align: middle;
+}
+
+.col-label {
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  min-width: 80px;
+}
+
+.col-status { width: 60px; }
+
+.col-value {
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  word-break: break-all;
+  color: var(--text);
+}
+
+/* Badges */
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.badge-ok { background: #DCFCE7; color: var(--ok); }
+.badge-missing { background: #FEE2E2; color: var(--missing); }
+.badge-info { background: #E0F2FE; color: var(--info); }
+
+/* === History === */
+.history-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.history-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+}
+
+.history-count {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.btn-clear {
+  background: none;
+  border: 1px solid var(--missing);
+  color: var(--missing);
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.history-empty {
+  padding: 60px 20px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.history-list {
+  list-style: none;
+}
+
+.history-item {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.1s;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.history-item:active { background: var(--bg); }
+
+.history-item-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.history-part {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--hkmc-blue);
+  font-family: monospace;
+}
+
+.history-time {
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.history-item-bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.history-date {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.history-raw {
+  font-family: monospace;
+  font-size: 11px;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
