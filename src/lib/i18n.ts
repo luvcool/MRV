@@ -43,6 +43,8 @@ const strings = {
     scanPaused: '스캔 중지됨',
     none: '-',
     partTab: (n: number, code: string) => code ? `부품${n} · ${code}` : `부품 ${n}`,
+    scannedLabel: (n: number) => `${n}개 부품 스캔 완료`,
+    btnRecan: '📷 재스캔',
   },
   en: {
     appTitle: 'MRV Barcode Scanner',
@@ -83,6 +85,8 @@ const strings = {
     scanPaused: 'Scan Paused',
     none: '-',
     partTab: (n: number, code: string) => code ? `Part${n} · ${code}` : `Part ${n}`,
+    scannedLabel: (n: number) => `${n} part(s) scanned`,
+    btnRecan: '📷 Rescan',
   },
 } as const
 
@@ -125,6 +129,8 @@ export interface Strings {
   scanPaused: string
   none: string
   partTab: (n: number, code: string) => string
+  scannedLabel: (n: number) => string
+  btnRecan: string
 }
 
 export const t = (lang: Lang): Strings => strings[lang]

@@ -272,6 +272,60 @@ html, body {
   color: var(--text-muted);
 }
 
+/* === Camera Mini Bar === */
+.camera-mini-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: #1A0A0C;
+  border-bottom: 2px solid var(--hkmc-blue);
+  flex-shrink: 0;
+}
+
+.mini-thumb {
+  width: 56px;
+  height: 42px;
+  object-fit: cover;
+  border-radius: 6px;
+  flex-shrink: 0;
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+.mini-thumb-ph {
+  width: 56px;
+  height: 42px;
+  border-radius: 6px;
+  flex-shrink: 0;
+  background: #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+.mini-label {
+  flex: 1;
+  color: rgba(255,255,255,0.85);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.btn-rescan-mini {
+  background: var(--hkmc-blue);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: opacity 0.15s;
+}
+
+.btn-rescan-mini:active { opacity: 0.8; }
+
 /* === Part Tabs === */
 .part-tabs {
   display: flex;
@@ -281,6 +335,13 @@ html, body {
   border-bottom: 1px solid var(--border);
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+}
+
+.part-tabs-sticky {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
 }
 
 .part-tab-btn {

@@ -48,6 +48,7 @@ export function App() {
   }
 
   const currentPart = parts[activePartIdx] ?? null
+  const hasResult = parts.length > 0
 
   return (
     <div className="app">
@@ -80,23 +81,38 @@ export function App() {
       <main className="app-main">
         {tab === 'scan' && (
           <div className="scan-page">
-            <Scanner onScan={handleScan} active={scanning} />
 
-            <div className="scan-controls">
-              {scanning ? (
-                <button className="btn btn-secondary" onClick={() => setScanning(false)}>
-                  {str.btnPause}
-                </button>
-              ) : (
-                <button className="btn btn-primary" onClick={handleRescan}>
-                  {str.btnRescan}
-                </button>
-              )}
-            </div>
+            {/* ── SCANNING MODE: full camera ── */}
+            {scanning && (
+              <>
+                <Scanner onScan={handleScan} active={scanning} />
+                <div className="scan-controls">
+                  <button className="btn btn-secondary" onClick={() => setScanning(false)}>
+                    {str.btnPause}
+                  </button>
+                </div>
+              </>
+            )}
 
-            {/* Multi-part tabs */}
-            {parts.length > 1 && (
-              <div className="part-tabs">
+            {/* ── RESULT MODE: mini camera bar ── */}
+            {!scanning && (
+              <div className="camera-mini-bar">
+                {currentImage
+                  ? <img src={currentImage} className="mini-thumb" alt="scan" />
+                  : <div className="mini-thumb-ph">📷</div>
+                }
+                <span className="mini-label">
+                  {str.scannedLabel(parts.length)}
+                </span>
+                <button className="btn-rescan-mini" onClick={handleRescan}>
+                  {str.btnRecan}
+                </button>
+              </div>
+            )}
+
+            {/* ── PART TABS: sticky, shown when 2+ parts ── */}
+            {hasResult && parts.length > 1 && (
+              <div className="part-tabs part-tabs-sticky">
                 {parts.map((p, i) => (
                   <button
                     key={i}
@@ -109,6 +125,7 @@ export function App() {
               </div>
             )}
 
+            {/* ── RESULT ── */}
             {currentPart && (
               <ParsedResult
                 parsed={currentPart}
@@ -116,7 +133,7 @@ export function App() {
               />
             )}
 
-            {parts.length === 0 && !scanning && (
+            {!hasResult && !scanning && (
               <div className="no-result">
                 <p>{str.noResult}</p>
               </div>
