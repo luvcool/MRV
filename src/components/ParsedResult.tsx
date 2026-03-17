@@ -3,6 +3,7 @@ import { formatDate } from '../lib/hkmc-parser'
 
 interface ParsedResultProps {
   parsed: ParsedHKMC
+  imageDataUrl?: string
 }
 
 type TableRow = {
@@ -16,7 +17,7 @@ function Badge({ status }: { status: TableRow['status'] }) {
   return <span className={`badge ${cls}`}>{status}</span>
 }
 
-export function ParsedResult({ parsed }: ParsedResultProps) {
+export function ParsedResult({ parsed, imageDataUrl }: ParsedResultProps) {
   const { fields, header, partNumbers, traceInfo, raw } = parsed
 
   const rows: TableRow[] = [
@@ -94,6 +95,14 @@ export function ParsedResult({ parsed }: ParsedResultProps) {
 
   return (
     <div className="result-card">
+      {/* Captured image */}
+      {imageDataUrl && (
+        <section className="capture-section">
+          <h3 className="section-title">촬영 이미지</h3>
+          <img src={imageDataUrl} alt="스캔 캡처" className="capture-img" />
+        </section>
+      )}
+
       {/* Raw barcode string */}
       <section className="raw-section">
         <h3 className="section-title">원문 바코드</h3>

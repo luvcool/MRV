@@ -9,19 +9,19 @@
 }
 
 :root {
-  --hkmc-blue: #002C5F;
-  --hkmc-blue-light: #1A4A8A;
-  --accent: #00AAD2;
-  --bg: #F4F6FA;
+  --hkmc-blue: #8B0020;
+  --hkmc-blue-light: #6B0018;
+  --accent: #E8395A;
+  --bg: #FDF4F5;
   --surface: #FFFFFF;
-  --border: #D8DDE6;
-  --text: #1A1A2E;
-  --text-muted: #6B7280;
+  --border: #E8D0D4;
+  --text: #1A0A0C;
+  --text-muted: #7A5C60;
   --ok: #16A34A;
   --missing: #DC2626;
   --info: #0369A1;
   --radius: 12px;
-  --shadow: 0 2px 8px rgba(0,0,0,0.1);
+  --shadow: 0 2px 8px rgba(139,0,32,0.1);
 }
 
 html, body {
@@ -61,6 +61,13 @@ html, body {
 }
 
 .header-logo { display: flex; align-items: center; }
+
+.header-logo-img {
+  height: 32px;
+  width: auto;
+  object-fit: contain;
+  flex-shrink: 0;
+}
 
 .header-title {
   font-size: 17px;
@@ -192,7 +199,7 @@ html, body {
 
 @keyframes scan-pulse {
   0%, 100% { border-color: rgba(255,255,255,0.9); }
-  50% { border-color: rgba(0, 170, 210, 0.9); }
+  50% { border-color: rgba(232, 57, 90, 0.9); }
 }
 
 .scanner-paused {
@@ -263,6 +270,19 @@ html, body {
   text-transform: uppercase;
   letter-spacing: 0.8px;
   margin-bottom: 8px;
+}
+
+/* Capture Image */
+.capture-section {}
+
+.capture-img {
+  width: 100%;
+  max-height: 220px;
+  object-fit: contain;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: #111;
+  display: block;
 }
 
 /* Raw String */

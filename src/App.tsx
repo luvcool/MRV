@@ -12,23 +12,27 @@ export function App() {
   const [tab, setTab] = useState<Tab>('scan')
   const [scanning, setScanning] = useState(true)
   const [parsed, setParsed] = useState<ParsedHKMC | null>(null)
+  const [currentImage, setCurrentImage] = useState<string>('')
   const { history, addRecord, clearHistory } = useHistory()
 
   const handleScan = useCallback((raw: string, imageDataUrl: string) => {
     const result = parseHKMC(raw)
     setParsed(result)
+    setCurrentImage(imageDataUrl)
     addRecord(raw, result, imageDataUrl)
-    setScanning(false) // pause after scan
+    setScanning(false)
   }, [addRecord])
 
   const handleRescan = () => {
     setParsed(null)
+    setCurrentImage('')
     setScanning(true)
   }
 
   const handleSelectHistory = (record: ScanRecord) => {
     if (record.parsed) {
       setParsed(record.parsed)
+      setCurrentImage(record.imageDataUrl || '')
       setTab('scan')
       setScanning(false)
     }
@@ -38,12 +42,7 @@ export function App() {
     <div className="app">
       {/* Header */}
       <header className="app-header">
-        <div className="header-logo">
-          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-            <rect width="28" height="28" rx="4" fill="#002C5F"/>
-            <path d="M4 8h4v12H4V8zm4 4h5v4H8v-4zm5-4h4v12h-4V8zm4 4h3v4h-3v-4zm3-4h4v12h-4V8z" fill="white"/>
-          </svg>
-        </div>
+        <img src="/logo.png" alt="MRV Logo" className="header-logo-img" />
         <h1 className="header-title">MRV 바코드 스캐너</h1>
       </header>
 
@@ -70,10 +69,8 @@ export function App() {
       <main className="app-main">
         {tab === 'scan' && (
           <div className="scan-page">
-            {/* Camera */}
             <Scanner onScan={handleScan} active={scanning} />
 
-            {/* Scan control buttons */}
             <div className="scan-controls">
               {scanning ? (
                 <button className="btn btn-secondary" onClick={() => setScanning(false)}>
@@ -86,8 +83,7 @@ export function App() {
               )}
             </div>
 
-            {/* Result */}
-            {parsed && <ParsedResult parsed={parsed} />}
+            {parsed && <ParsedResult parsed={parsed} imageDataUrl={currentImage} />}
 
             {!parsed && !scanning && (
               <div className="no-result">
