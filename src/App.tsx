@@ -4,6 +4,8 @@ import { ParsedResult } from './components/ParsedResult'
 import { ScanHistory } from './components/ScanHistory'
 import { parseHKMC } from './lib/hkmc-parser'
 import { useHistory } from './hooks/useHistory'
+import { useLang } from './contexts/LangContext'
+import { t } from './lib/i18n'
 import type { ParsedHKMC, ScanRecord } from './types/hkmc'
 
 type Tab = 'scan' | 'history'
@@ -14,6 +16,8 @@ export function App() {
   const [parsed, setParsed] = useState<ParsedHKMC | null>(null)
   const [currentImage, setCurrentImage] = useState<string>('')
   const { history, addRecord, clearHistory } = useHistory()
+  const { lang, toggle } = useLang()
+  const str = t(lang)
 
   const handleScan = useCallback((raw: string, imageDataUrl: string) => {
     const result = parseHKMC(raw)
@@ -40,32 +44,32 @@ export function App() {
 
   return (
     <div className="app">
-      {/* Header */}
       <header className="app-header">
         <img src="/logo.png" alt="MRV Logo" className="header-logo-img" />
-        <h1 className="header-title">MRV 바코드 스캐너</h1>
+        <h1 className="header-title">{str.appTitle}</h1>
+        <button className="lang-toggle" onClick={toggle}>
+          {lang === 'ko' ? 'EN' : '한'}
+        </button>
       </header>
 
-      {/* Tab Bar */}
       <nav className="tab-bar">
         <button
           className={`tab-btn ${tab === 'scan' ? 'active' : ''}`}
           onClick={() => setTab('scan')}
         >
-          스캔
+          {str.tabScan}
         </button>
         <button
           className={`tab-btn ${tab === 'history' ? 'active' : ''}`}
           onClick={() => setTab('history')}
         >
-          이력
+          {str.tabHistory}
           {history.length > 0 && (
             <span className="tab-badge">{history.length}</span>
           )}
         </button>
       </nav>
 
-      {/* Main Content */}
       <main className="app-main">
         {tab === 'scan' && (
           <div className="scan-page">
@@ -74,11 +78,11 @@ export function App() {
             <div className="scan-controls">
               {scanning ? (
                 <button className="btn btn-secondary" onClick={() => setScanning(false)}>
-                  ⏸ 일시 정지
+                  {str.btnPause}
                 </button>
               ) : (
                 <button className="btn btn-primary" onClick={handleRescan}>
-                  📷 다시 스캔
+                  {str.btnRescan}
                 </button>
               )}
             </div>
@@ -87,7 +91,7 @@ export function App() {
 
             {!parsed && !scanning && (
               <div className="no-result">
-                <p>스캔된 바코드가 없습니다.</p>
+                <p>{str.noResult}</p>
               </div>
             )}
           </div>

@@ -1,5 +1,7 @@
 import type { ScanRecord } from '../types/hkmc'
 import { formatDate } from '../lib/hkmc-parser'
+import { useLang } from '../contexts/LangContext'
+import { t } from '../lib/i18n'
 
 interface ScanHistoryProps {
   history: ScanRecord[]
@@ -23,10 +25,13 @@ function formatTime(iso: string): string {
 }
 
 export function ScanHistory({ history, onSelect, onClear }: ScanHistoryProps) {
+  const { lang } = useLang()
+  const str = t(lang)
+
   if (history.length === 0) {
     return (
       <div className="history-empty">
-        <p>스캔 이력이 없습니다.</p>
+        <p>{str.noHistory}</p>
       </div>
     )
   }
@@ -34,48 +39,40 @@ export function ScanHistory({ history, onSelect, onClear }: ScanHistoryProps) {
   return (
     <div className="history-container">
       <div className="history-header">
-        <span className="history-count">최근 {history.length}개</span>
+        <span className="history-count">{str.recentN(history.length)}</span>
         <button className="btn-clear" onClick={onClear}>
-          전체 삭제
+          {str.clearAll}
         </button>
       </div>
 
       <ul className="history-list">
         {history.map(record => (
-          <li
-            key={record.id}
-            className="history-item"
-            onClick={() => onSelect(record)}
-          >
+          <li key={record.id} className="history-item" onClick={() => onSelect(record)}>
             <div className="history-item-row">
-              {/* Thumbnail */}
               {record.imageDataUrl ? (
                 <img
                   className="history-thumb"
                   src={record.imageDataUrl}
-                  alt="스캔 이미지"
+                  alt="scan"
                   loading="lazy"
                 />
               ) : (
-                <div className="history-thumb-placeholder">
-                  <span>📷</span>
-                </div>
+                <div className="history-thumb-placeholder"><span>📷</span></div>
               )}
 
-              {/* Info */}
               <div className="history-item-info">
                 <div className="history-item-top">
                   <span className="history-part">
                     {record.partNumbers.length > 0
                       ? record.partNumbers.join(', ')
-                      : '부품번호 없음'}
+                      : str.noPartNum}
                   </span>
                   <span className="history-time">{formatTime(record.scannedAt)}</span>
                 </div>
                 <div className="history-item-bottom">
                   {record.productionDate && (
                     <span className="history-date">
-                      생산: {formatDate(record.productionDate)}
+                      {str.prodLabel} {formatDate(record.productionDate)}
                     </span>
                   )}
                   <span className="history-raw">

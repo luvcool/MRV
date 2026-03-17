@@ -1,5 +1,7 @@
 import type { ParsedHKMC } from '../types/hkmc'
 import { formatDate } from '../lib/hkmc-parser'
+import { useLang } from '../contexts/LangContext'
+import { t } from '../lib/i18n'
 
 interface ParsedResultProps {
   parsed: ParsedHKMC
@@ -18,128 +20,121 @@ function Badge({ status }: { status: TableRow['status'] }) {
 }
 
 export function ParsedResult({ parsed, imageDataUrl }: ParsedResultProps) {
+  const { lang } = useLang()
+  const str = t(lang)
   const { fields, header, partNumbers, traceInfo, raw } = parsed
+
+  const none = str.none
 
   const rows: TableRow[] = [
     {
-      label: 'Header',
-      value: header,
+      label: str.fHeader,
+      value: header || none,
       status: header ? 'OK' : 'MISSING',
     },
     {
-      label: '업체 코드',
-      value: fields.V ?? '-',
+      label: str.fVendor,
+      value: fields.V ?? none,
       status: fields.V ? 'OK' : 'MISSING',
     },
     {
-      label: '부품 번호',
-      value: partNumbers.length > 0 ? partNumbers.join(' / ') : (fields.P ?? '-'),
+      label: str.fPart,
+      value: partNumbers.length > 0 ? partNumbers.join(' / ') : (fields.P ?? none),
       status: partNumbers.length > 0 ? 'OK' : 'MISSING',
     },
     {
-      label: '서열 코드',
-      value: fields.S ?? '-',
+      label: str.fSeq,
+      value: fields.S ?? none,
       status: fields.S ? 'OK' : 'MISSING',
     },
     {
-      label: 'EO 번호',
-      value: fields.E ?? '-',
+      label: str.fEO,
+      value: fields.E ?? none,
       status: fields.E ? 'OK' : 'MISSING',
     },
   ]
 
   if (traceInfo) {
+    const lotLabel =
+      traceInfo.lotType === 'A' ? str.lotA
+      : traceInfo.lotType === '@' ? str.lotAt
+      : traceInfo.lotType
+
     rows.push(
       {
-        label: '생산일자',
+        label: str.fProdDate,
         value: traceInfo.productionDate
           ? `${traceInfo.productionDate} (${formatDate(traceInfo.productionDate)})`
-          : '-',
+          : none,
         status: traceInfo.productionDate ? 'OK' : 'MISSING',
       },
       {
-        label: '부품 4M',
-        value: traceInfo.fourM || '-',
+        label: str.fFourM,
+        value: traceInfo.fourM || none,
         status: traceInfo.fourM ? 'OK' : 'MISSING',
       },
       {
-        label: 'Lot 방식',
-        value: traceInfo.lotType
-          ? `${traceInfo.lotType} — ${traceInfo.lotTypeLabel}`
-          : '-',
+        label: str.fLotType,
+        value: traceInfo.lotType ? `${traceInfo.lotType} — ${lotLabel}` : none,
         status: traceInfo.lotType ? 'OK' : 'MISSING',
       },
       {
-        label: '제조 시리얼',
-        value: traceInfo.serial || '-',
+        label: str.fSerial,
+        value: traceInfo.serial || none,
         status: traceInfo.serial ? 'OK' : 'MISSING',
       },
     )
   } else if (fields.T) {
-    rows.push({
-      label: '추적 코드',
-      value: fields.T,
-      status: 'INFO',
-    })
+    rows.push({ label: str.fTrace, value: fields.T, status: 'INFO' })
   }
 
-  if (fields['1']) {
-    rows.push({ label: '특이 정보', value: fields['1'], status: 'INFO' })
-  }
-  if (fields.M) {
-    rows.push({ label: '초도품 구분', value: fields.M, status: 'INFO' })
-  }
-  if (fields.C) {
-    rows.push({ label: '업체 영역', value: fields.C, status: 'INFO' })
-  }
+  if (fields['1']) rows.push({ label: str.fSpecial, value: fields['1'], status: 'INFO' })
+  if (fields.M)   rows.push({ label: str.fFirst,   value: fields.M,    status: 'INFO' })
+  if (fields.C)   rows.push({ label: str.fVendorArea, value: fields.C, status: 'INFO' })
 
   return (
     <div className="result-card">
       {/* Captured image */}
       {imageDataUrl && (
         <section className="capture-section">
-          <h3 className="section-title">촬영 이미지</h3>
-          <img src={imageDataUrl} alt="스캔 캡처" className="capture-img" />
+          <h3 className="section-title">{str.captureImage}</h3>
+          <img src={imageDataUrl} alt="scan capture" className="capture-img" />
         </section>
       )}
 
       {/* Raw barcode string */}
       <section className="raw-section">
-        <h3 className="section-title">원문 바코드</h3>
+        <h3 className="section-title">{str.rawBarcode}</h3>
         <div className="raw-string">{raw}</div>
       </section>
 
       {/* Multi-part notice */}
       {partNumbers.length > 1 && (
         <div className="multipart-banner">
-          <span>🔢 Multi-Part 바코드 ({partNumbers.length}개 부품)</span>
+          <span>{str.multiPartBanner(partNumbers.length)}</span>
           <ul className="multipart-list">
-            {partNumbers.map((p, i) => (
-              <li key={i}>{p}</li>
-            ))}
+            {partNumbers.map((p, i) => <li key={i}>{p}</li>)}
           </ul>
         </div>
       )}
 
       {/* HKMC Standard Table */}
       <section>
-        <h3 className="section-title">HKMC 표준 분석</h3>
+        <h3 className="section-title">{str.stdAnalysis}</h3>
         <div className="table-wrapper">
           <table className="result-table">
             <thead>
               <tr>
-                <th>구분</th>
-                <th>결과</th>
-                <th>데이터</th>
+                <th>{str.colField}</th>
+                <th>{str.colResult}</th>
+                <th>{str.colData}</th>
               </tr>
             </thead>
             <tbody>
               {rows.map((row, i) => (
                 <tr key={i}>
                   <td className="col-label">{row.label}</td>
-                  <td className="col-status">
-                    <Badge status={row.status} />
-                  </td>
+                  <td className="col-status"><Badge status={row.status} /></td>
                   <td className="col-value">{row.value}</td>
                 </tr>
               ))}

@@ -5,6 +5,8 @@ import {
   DecodeHintType,
   NotFoundException,
 } from '@zxing/library'
+import { useLang } from '../contexts/LangContext'
+import { t } from '../lib/i18n'
 
 interface ScannerProps {
   onScan: (text: string, imageDataUrl: string) => void
@@ -21,6 +23,8 @@ async function listVideoInputDevices(): Promise<MediaDeviceInfo[]> {
 }
 
 export function Scanner({ onScan, active }: ScannerProps) {
+  const { lang } = useLang()
+  const str = t(lang)
   const videoRef = useRef<HTMLVideoElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const readerRef = useRef<BrowserMultiFormatReader | null>(null)
@@ -88,9 +92,9 @@ export function Scanner({ onScan, active }: ScannerProps) {
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e)
       if (msg.toLowerCase().includes('permission') || msg.toLowerCase().includes('notallowed')) {
-        setError('카메라 권한이 필요합니다. 브라우저 설정에서 카메라를 허용해 주세요.')
+        setError(str.camPermErr)
       } else {
-        setError(`카메라 오류: ${msg}`)
+        setError(str.camErr(msg))
       }
     }
   }, [onScan, stopScanning, captureFrame])
@@ -139,7 +143,7 @@ export function Scanner({ onScan, active }: ScannerProps) {
         </div>
         {!active && (
           <div className="scanner-paused">
-            <span>스캔 중지됨</span>
+            <span>{str.scanPaused}</span>
           </div>
         )}
       </div>
