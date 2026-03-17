@@ -18,9 +18,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'icons/*.png'],
       manifest: {
-        name: 'HKMC 2D Barcode Scanner',
-        short_name: 'HKMC Scan',
-        description: 'HKMC Data Matrix & QR Code Scanner',
+        name: 'MRV 2D Barcode Scanner',
+        short_name: 'MRV Scan',
+        description: 'MRV Data Matrix & QR Code Scanner',
         theme_color: '#002C5F',
         background_color: '#ffffff',
         display: 'standalone',

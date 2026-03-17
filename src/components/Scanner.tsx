@@ -7,7 +7,7 @@ import {
 } from '@zxing/library'
 
 interface ScannerProps {
-  onScan: (text: string) => void
+  onScan: (text: string, imageDataUrl: string) => void
   active: boolean
 }
 
@@ -22,12 +22,27 @@ async function listVideoInputDevices(): Promise<MediaDeviceInfo[]> {
 
 export function Scanner({ onScan, active }: ScannerProps) {
   const videoRef = useRef<HTMLVideoElement>(null)
+  const canvasRef = useRef<HTMLCanvasElement>(null)
   const readerRef = useRef<BrowserMultiFormatReader | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [cameras, setCameras] = useState<MediaDeviceInfo[]>([])
   const [selectedCamera, setSelectedCamera] = useState<string>('')
   const lastScan = useRef<string>('')
   const scanCooldown = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const captureFrame = useCallback((): string => {
+    const video = videoRef.current
+    const canvas = canvasRef.current
+    if (!video || !canvas || video.readyState < 2) return ''
+    const W = 320
+    const H = Math.round((video.videoHeight * W) / (video.videoWidth || 1)) || 240
+    canvas.width = W
+    canvas.height = H
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return ''
+    ctx.drawImage(video, 0, 0, W, H)
+    return canvas.toDataURL('image/jpeg', 0.65)
+  }, [])
 
   const stopScanning = useCallback(() => {
     readerRef.current?.reset()
@@ -46,7 +61,6 @@ export function Scanner({ onScan, active }: ScannerProps) {
     ])
     hints.set(DecodeHintType.TRY_HARDER, true)
 
-    // Second param is timeBetweenScansMillis (number)
     const reader = new BrowserMultiFormatReader(hints, 200)
     readerRef.current = reader
 
@@ -62,7 +76,8 @@ export function Scanner({ onScan, active }: ScannerProps) {
           const text = result.getText()
           if (text !== lastScan.current) {
             lastScan.current = text
-            onScan(text)
+            const imageDataUrl = captureFrame()
+            onScan(text, imageDataUrl)
             if (scanCooldown.current) clearTimeout(scanCooldown.current)
             scanCooldown.current = setTimeout(() => { lastScan.current = '' }, 2000)
           }
@@ -78,9 +93,8 @@ export function Scanner({ onScan, active }: ScannerProps) {
         setError(`카메라 오류: ${msg}`)
       }
     }
-  }, [onScan, stopScanning])
+  }, [onScan, stopScanning, captureFrame])
 
-  // Load available cameras once
   useEffect(() => {
     listVideoInputDevices().then(devices => {
       setCameras(devices)
@@ -92,7 +106,6 @@ export function Scanner({ onScan, active }: ScannerProps) {
     })
   }, [])
 
-  // Start/stop based on active prop
   useEffect(() => {
     if (active) {
       startScanning(selectedCamera || undefined)
@@ -130,6 +143,9 @@ export function Scanner({ onScan, active }: ScannerProps) {
           </div>
         )}
       </div>
+
+      {/* Hidden canvas for frame capture */}
+      <canvas ref={canvasRef} style={{ display: 'none' }} />
 
       {error && (
         <div className="scanner-error">

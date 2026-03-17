@@ -24,7 +24,7 @@ function saveHistory(records: ScanRecord[]) {
 export function useHistory() {
   const [history, setHistory] = useState<ScanRecord[]>(loadHistory)
 
-  const addRecord = useCallback((raw: string, parsed: ParsedHKMC) => {
+  const addRecord = useCallback((raw: string, parsed: ParsedHKMC, imageDataUrl?: string) => {
     const record: ScanRecord = {
       id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
       scannedAt: new Date().toISOString(),
@@ -32,6 +32,7 @@ export function useHistory() {
       productionDate: parsed.traceInfo?.productionDate,
       raw,
       parsed,
+      imageDataUrl: imageDataUrl || undefined,
     }
 
     setHistory(prev => {

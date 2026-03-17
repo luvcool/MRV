@@ -14,10 +14,10 @@ export function App() {
   const [parsed, setParsed] = useState<ParsedHKMC | null>(null)
   const { history, addRecord, clearHistory } = useHistory()
 
-  const handleScan = useCallback((raw: string) => {
+  const handleScan = useCallback((raw: string, imageDataUrl: string) => {
     const result = parseHKMC(raw)
     setParsed(result)
-    addRecord(raw, result)
+    addRecord(raw, result, imageDataUrl)
     setScanning(false) // pause after scan
   }, [addRecord])
 
@@ -44,7 +44,7 @@ export function App() {
             <path d="M4 8h4v12H4V8zm4 4h5v4H8v-4zm5-4h4v12h-4V8zm4 4h3v4h-3v-4zm3-4h4v12h-4V8z" fill="white"/>
           </svg>
         </div>
-        <h1 className="header-title">HKMC 바코드 스캐너</h1>
+        <h1 className="header-title">MRV 바코드 스캐너</h1>
       </header>
 
       {/* Tab Bar */}

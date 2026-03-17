@@ -33,4 +33,5 @@ export interface ScanRecord {
   productionDate?: string
   raw: string
   parsed?: ParsedHKMC
+  imageDataUrl?: string   // captured camera frame (JPEG base64)
 }
