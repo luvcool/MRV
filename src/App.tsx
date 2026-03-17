@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react'
 import { Scanner } from './components/Scanner'
 import { ParsedResult } from './components/ParsedResult'
 import { ScanHistory } from './components/ScanHistory'
-import { parseHKMC } from './lib/hkmc-parser'
+import { parseMultiHKMC } from './lib/hkmc-parser'
 import { useHistory } from './hooks/useHistory'
 import { useLang } from './contexts/LangContext'
 import { t } from './lib/i18n'
@@ -13,34 +13,41 @@ type Tab = 'scan' | 'history'
 export function App() {
   const [tab, setTab] = useState<Tab>('scan')
   const [scanning, setScanning] = useState(true)
-  const [parsed, setParsed] = useState<ParsedHKMC | null>(null)
+  const [parts, setParts] = useState<ParsedHKMC[]>([])
+  const [activePartIdx, setActivePartIdx] = useState(0)
   const [currentImage, setCurrentImage] = useState<string>('')
   const { history, addRecord, clearHistory } = useHistory()
   const { lang, toggle } = useLang()
   const str = t(lang)
 
   const handleScan = useCallback((raw: string, imageDataUrl: string) => {
-    const result = parseHKMC(raw)
-    setParsed(result)
+    const result = parseMultiHKMC(raw)
+    setParts(result)
+    setActivePartIdx(0)
     setCurrentImage(imageDataUrl)
     addRecord(raw, result, imageDataUrl)
     setScanning(false)
   }, [addRecord])
 
   const handleRescan = () => {
-    setParsed(null)
+    setParts([])
+    setActivePartIdx(0)
     setCurrentImage('')
     setScanning(true)
   }
 
   const handleSelectHistory = (record: ScanRecord) => {
-    if (record.parsed) {
-      setParsed(record.parsed)
+    const allParts = record.parts ?? (record.parsed ? [record.parsed] : [])
+    if (allParts.length > 0) {
+      setParts(allParts)
+      setActivePartIdx(0)
       setCurrentImage(record.imageDataUrl || '')
       setTab('scan')
       setScanning(false)
     }
   }
+
+  const currentPart = parts[activePartIdx] ?? null
 
   return (
     <div className="app">
@@ -87,9 +94,29 @@ export function App() {
               )}
             </div>
 
-            {parsed && <ParsedResult parsed={parsed} imageDataUrl={currentImage} />}
+            {/* Multi-part tabs */}
+            {parts.length > 1 && (
+              <div className="part-tabs">
+                {parts.map((p, i) => (
+                  <button
+                    key={i}
+                    className={`part-tab-btn ${activePartIdx === i ? 'active' : ''}`}
+                    onClick={() => setActivePartIdx(i)}
+                  >
+                    {str.partTab(i + 1, p.partNumbers[0] ?? '')}
+                  </button>
+                ))}
+              </div>
+            )}
 
-            {!parsed && !scanning && (
+            {currentPart && (
+              <ParsedResult
+                parsed={currentPart}
+                imageDataUrl={activePartIdx === 0 ? currentImage : ''}
+              />
+            )}
+
+            {parts.length === 0 && !scanning && (
               <div className="no-result">
                 <p>{str.noResult}</p>
               </div>

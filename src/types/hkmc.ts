@@ -32,6 +32,7 @@ export interface ScanRecord {
   partNumbers: string[]
   productionDate?: string
   raw: string
-  parsed?: ParsedHKMC
+  parsed?: ParsedHKMC     // first part (backward compat)
+  parts?: ParsedHKMC[]    // all parts when multi-part barcode
   imageDataUrl?: string   // captured camera frame (JPEG base64)
 }

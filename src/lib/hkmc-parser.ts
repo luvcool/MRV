@@ -25,16 +25,23 @@ function parseTraceCode(t: string): TraceInfo {
   return { productionDate, fourM, lotType, lotTypeLabel, serial }
 }
 
+export function parseMultiHKMC(raw: string): ParsedHKMC[] {
+  // '#' separates complete barcode records
+  const parts = raw.split('#').map(s => s.trim()).filter(s => s.length > 0)
+  if (parts.length <= 1) return [parseHKMC(raw)]
+  return parts.map(p => parseHKMC(p))
+}
+
 export function parseHKMC(raw: string): ParsedHKMC {
   let header = ''
 
   // Normalize: remove EOT
   let str = raw.replace(new RegExp(EOT, 'g'), '')
 
-  // Extract header: starts with ]> then RS, e.g., ]>\x1E06
-  // The header section is everything before the first DI field
+  // Extract header: supports both ]> and [)> variants
   let headerPrefix = ''
-  if (str.startsWith(']>')) {
+  const hasHeader = str.startsWith(']>') || str.startsWith('[)>')
+  if (hasHeader) {
     // Find first GS
     const firstGS = str.indexOf(GS)
     if (firstGS !== -1) {

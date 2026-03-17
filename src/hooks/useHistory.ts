@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react'
 import type { ScanRecord, ParsedHKMC } from '../types/hkmc'
 
+
 const STORAGE_KEY = 'hkmc-scan-history'
 const MAX_RECORDS = 20
 
@@ -24,14 +25,17 @@ function saveHistory(records: ScanRecord[]) {
 export function useHistory() {
   const [history, setHistory] = useState<ScanRecord[]>(loadHistory)
 
-  const addRecord = useCallback((raw: string, parsed: ParsedHKMC, imageDataUrl?: string) => {
+  const addRecord = useCallback((raw: string, parts: ParsedHKMC[], imageDataUrl?: string) => {
+    const first = parts[0]
+    const allPartNumbers = parts.flatMap(p => p.partNumbers)
     const record: ScanRecord = {
       id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
       scannedAt: new Date().toISOString(),
-      partNumbers: parsed.partNumbers,
-      productionDate: parsed.traceInfo?.productionDate,
+      partNumbers: allPartNumbers,
+      productionDate: first?.traceInfo?.productionDate,
       raw,
-      parsed,
+      parsed: first,
+      parts,
       imageDataUrl: imageDataUrl || undefined,
     }
 

@@ -42,6 +42,7 @@ const strings = {
     camErr: (msg: string) => `카메라 오류: ${msg}`,
     scanPaused: '스캔 중지됨',
     none: '-',
+    partTab: (n: number, code: string) => code ? `부품${n} · ${code}` : `부품 ${n}`,
   },
   en: {
     appTitle: 'MRV Barcode Scanner',
@@ -81,6 +82,7 @@ const strings = {
     camErr: (msg: string) => `Camera error: ${msg}`,
     scanPaused: 'Scan Paused',
     none: '-',
+    partTab: (n: number, code: string) => code ? `Part${n} · ${code}` : `Part ${n}`,
   },
 } as const
 
@@ -122,6 +124,7 @@ export interface Strings {
   camErr: (msg: string) => string
   scanPaused: string
   none: string
+  partTab: (n: number, code: string) => string
 }
 
 export const t = (lang: Lang): Strings => strings[lang]
