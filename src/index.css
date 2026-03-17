@@ -399,14 +399,39 @@ html, body {
 
 .raw-string {
   background: #1A1A2E;
-  color: #A5F3FC;
+  color: #E2E8F0;
   font-family: 'Courier New', monospace;
-  font-size: 12px;
+  font-size: 13px;
   padding: 12px;
   border-radius: 8px;
   word-break: break-all;
-  line-height: 1.6;
+  line-height: 1.9;
   overflow-x: auto;
+}
+
+/* Control character badges */
+.ctrl-gs, .ctrl-rs, .ctrl-eot, .ctrl-hash {
+  display: inline-flex;
+  align-items: baseline;
+  font-weight: 800;
+  line-height: 1;
+  border-radius: 3px;
+  padding: 1px 1px;
+  font-size: 13px;
+}
+
+.ctrl-gs   { color: #FF6B35; }
+.ctrl-rs   { color: #4ADE80; }
+.ctrl-eot  { color: #F87171; }
+.ctrl-hash { color: #FACC15; font-size: 15px; padding: 0 2px; }
+
+.ctrl-main { font-size: 13px; }
+
+.ctrl-gs sup, .ctrl-rs sup, .ctrl-eot sup {
+  font-size: 9px;
+  font-weight: 800;
+  vertical-align: super;
+  line-height: 0;
 }
 
 /* Multi-part */

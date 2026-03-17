@@ -3,6 +3,27 @@ import { formatDate } from '../lib/hkmc-parser'
 import { useLang } from '../contexts/LangContext'
 import { t } from '../lib/i18n'
 
+const GS  = '\x1D'
+const RS  = '\x1E'
+const EOT = '\x04'
+
+function RawBarcode({ raw }: { raw: string }) {
+  // Split on control characters and '#', keep delimiters
+  const parts = raw.split(/([\x1D\x1E\x04#])/g)
+
+  return (
+    <div className="raw-string">
+      {parts.map((seg, i) => {
+        if (seg === GS)  return <span key={i} className="ctrl-gs"><span className="ctrl-main">G</span><sup>S</sup></span>
+        if (seg === RS)  return <span key={i} className="ctrl-rs"><span className="ctrl-main">R</span><sup>S</sup></span>
+        if (seg === EOT) return <span key={i} className="ctrl-eot"><span className="ctrl-main">E</span><sup>OT</sup></span>
+        if (seg === '#') return <span key={i} className="ctrl-hash">#</span>
+        return <span key={i}>{seg}</span>
+      })}
+    </div>
+  )
+}
+
 interface ParsedResultProps {
   parsed: ParsedHKMC
   imageDataUrl?: string
@@ -105,7 +126,7 @@ export function ParsedResult({ parsed, imageDataUrl }: ParsedResultProps) {
       {/* Raw barcode string */}
       <section className="raw-section">
         <h3 className="section-title">{str.rawBarcode}</h3>
-        <div className="raw-string">{raw}</div>
+        <RawBarcode raw={raw} />
       </section>
 
       {/* Multi-part notice */}
